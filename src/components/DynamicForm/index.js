@@ -1,92 +1,67 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
 import './form.css';
 
-export default  class DynamicForm extends React.Component {
-    state ={};
-    constructor(props) {
-        super(props);
-    }
-    static getDerivedStateFromProps(nextProps, prevState) {
-        if (nextProps.defaultValues && Object.keys(nextProps.defaultValues).length) {
-            return {
-                ...nextProps.defaultValues
-            }
-        } else {
-            // Assign default values of "" to our controlled input
-            // If we don't do this, React will throw the error
-            // that Input elements should not switch from uncontrolled to controlled 
-            // or (vice versa)
+export default class DynamicForm extends React.Component {
+    
+    state = { loading: false, errors: [], data: {} };  
 
-            let initialState = nextProps.model.reduce((acc, m) => {
-                acc[m.key] = m.value ? m.value : "";
-                return acc;
-            },{});
-            console.log("initialState: ", initialState);
-            return {
-                ...initialState
-            }
-        }
+    componentWillReceiveProps(nextProps){
+        if(nextProps.defaultValues !== this.props.defaultValues)         
+           this.onReset();
+    }
+
+    onReset = () => {        
+        this.setState({ loading: false, errors: [], data: {}}); 
     }
 
     onSubmit = (e) => {
         e.preventDefault();
-        if (this.props.onSubmit) this.props.onSubmit(this.state);
+        let result = Object.assign({}, this.props.defaultValues, this.state.data);
+        if (this.props.onSubmit) 
+            this.props.onSubmit(result);
     }
 
-    onChange = (e, key,type="single") => {
-        console.log(`${key} changed ${e.target.value} type ${type}`);
+    onChange = (e, key, type="single") => {  
+        let value;      
         if (type === "single") {
-            this.setState({
-                [key]: e.target.value  
-            });
-        } else {
-            // Array of values (e.g. checkbox): TODO: Optimization needed.
-            let found = this.state[key] ?  
-                            this.state[key].find ((d) => d === e.target.value) : false;
-            
-            if (found) {
-                let data = this.state[key].filter((d) => {
-                    return d !== found;
-                });
-                this.setState({
-                    [key]: data
-                });
-            } else {
-                this.setState({
-                    [key]: [e.target.value, ...this.state[key]]
-                });
-            }
-        }
-    }
+            value = e.target.value;
+        } else { 
+            value = this.state[key] || [];
 
+            if (e.target.checked)
+                value.push(e.target.value);
+
+            if (!e.target.checked)
+                value.splice(value.indexOf(e.target.value), 1);                          
+        }
+
+        var data = Object.assign({}, this.state.data, { [key]: value });
+        this.setState( { data: data });    
+    }
 
     renderForm = () => {
-        let model = this.props.model;
-        let defaultValues = this.props.defaultValues;
+        let model = this.props.model; 
         
         let formUI = model.map((m) => {
             let key = m.key;
             let type = m.type || "text";
             let props = m.props || {};
             let name= m.name;
-            let value = m.value;
 
-            let target = key;  
-            value = this.state[target];
+            let defaultValue = this.props.defaultValues[m.key] || "";
+            let value = this.state.data[key] || defaultValue;               
 
-            let input =  <input {...props}
+            let input = <input {...props}
                     className="form-input"
                     type={type}
                     key={key}
                     name={name}
                     value={value}
-                    onChange={(e)=>{this.onChange(e, target)}}
+                    onChange={(e)=>{this.onChange(e, key)}}
                 />;
 
-            if (type == "radio") {
-               input = m.options.map((o) => {
-                   let checked = o.value == value;
+            if (type === "radio") {
+               input = m.options.map((o) => {                 
                     return (
                         <React.Fragment key={'fr' + o.key}>
                             <input {...props}
@@ -94,7 +69,7 @@ export default  class DynamicForm extends React.Component {
                                     type={type}
                                     key={o.key}
                                     name={o.name}
-                                    checked={checked}
+                                    checked={ o.value === value}
                                     value={o.value}
                                     onChange={(e)=>{this.onChange(e, o.name)}}
                             />
@@ -105,33 +80,29 @@ export default  class DynamicForm extends React.Component {
                input = <div className ="form-group-radio">{input}</div>;
             }
 
-            if (type == "select") {
-                input = m.options.map((o) => {
-                    let checked = o.value == value;
-                    console.log("select: ", o.value, value);
-                     return (
-                            <option {...props}
-                                className="form-input"
-                                key={o.key}
-                                value={o.value}
-                            >{o.value}</option>
-                     );
+            if (type === "select") {
+                input = m.options.map((o) => {  
+                    return (
+                        <option {...props}
+                            className="form-input"
+                            key={o.key}
+                            value={o.value}
+                            checked={ o.value === value}
+                        >{o.value}</option>
+                    );
                 });
-
-                console.log("Select default: ", value);
+               
                 input = <select value={value} onChange={(e)=>{this.onChange(e, m.key)}}>{input}</select>;
-             }
+            }
 
-             if (type == "checkbox") {
-                input = m.options.map((o) => {
-                    
-                    //let checked = o.value == value;
+            if (type === "checkbox") {
+                input = m.options.map((o) => {                   
+                   
                     let checked = false;
-                    if (value && value.length > 0) {
-                        checked = value.indexOf(o.value) > -1 ? true: false;
-                    }
-                    console.log("Checkbox: ",checked);
-                     return (
+                    if (value && value.length > 0)
+                        checked = value.indexOf(o.value) > -1 ? true : false;
+                                       
+                    return (
                         <React.Fragment key={"cfr" + o.key}>
                             <input {...props}
                                 className="form-input"
@@ -148,8 +119,7 @@ export default  class DynamicForm extends React.Component {
                 });
 
                 input = <div className ="form-group-checkbox">{input}</div>;
-
-             }
+            }
             
             return (
                 <div key={'g' + key} className="form-group">
@@ -174,6 +144,7 @@ export default  class DynamicForm extends React.Component {
                 <form className="dynamic-form" onSubmit={(e)=>{this.onSubmit(e)}}>
                     {this.renderForm()}
                     <div className="form-actions">
+                        <button type="reset" onClick={this.onReset}>reset</button>
                         <button type="submit">submit</button>
                     </div>
                 </form>
