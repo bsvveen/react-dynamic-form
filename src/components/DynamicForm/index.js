@@ -1,6 +1,10 @@
 import React from 'react';
 import './form.css';
 
+import CheckBox from './controls/checkbox';
+import Radio from './controls/radio';
+import Select from './controls/select';
+
 export default class DynamicForm extends React.Component {
     
     state = { loading: false, errors: [], data: {} };  
@@ -11,7 +15,7 @@ export default class DynamicForm extends React.Component {
     }
 
     onReset = () => {        
-        this.setState({ loading: false, errors: [], data: {}}); 
+        this.setState({ loading: false, errors: [], data: {} }); 
     }
 
     onSubmit = (e) => {
@@ -21,12 +25,12 @@ export default class DynamicForm extends React.Component {
             this.props.onSubmit(result);
     }
 
-    onChange = (e, key, type="single") => {  
+    onChange = (e, key, type = "single") => {  
         let value;      
         if (type === "single") {
             value = e.target.value;
         } else { 
-            value = this.state[key] || [];
+            value = this.state.data[key] || [];
 
             if (e.target.checked)
                 value.push(e.target.value);
@@ -60,66 +64,14 @@ export default class DynamicForm extends React.Component {
                     onChange={(e)=>{this.onChange(e, key)}}
                 />;
 
-            if (type === "radio") {
-               input = m.options.map((o) => {                 
-                    return (
-                        <React.Fragment key={'fr' + o.key}>
-                            <input {...props}
-                                    className="form-input"
-                                    type={type}
-                                    key={o.key}
-                                    name={o.name}
-                                    checked={ o.value === value}
-                                    value={o.value}
-                                    onChange={(e)=>{this.onChange(e, o.name)}}
-                            />
-                            <label key={"ll" +o.key }>{o.label}</label>
-                        </React.Fragment>
-                    );
-               });
-               input = <div className ="form-group-radio">{input}</div>;
-            }
+            if (type === "radio") 
+                input = <Radio m={m} value={value} onChange={this.onChange} {...props} />  
+           
+            if (type === "select") 
+                input = <Select m={m} value={value} onChange={this.onChange} {...props} />    
 
-            if (type === "select") {
-                input = m.options.map((o) => {  
-                    return (
-                        <option {...props}
-                            className="form-input"
-                            key={o.key}
-                            value={o.value}
-                            checked={ o.value === value}
-                        >{o.value}</option>
-                    );
-                });
-               
-                input = <select value={value} onChange={(e)=>{this.onChange(e, m.key)}}>{input}</select>;
-            }
-
-            if (type === "checkbox") {
-                input = m.options.map((o) => {                   
-                   
-                    let checked = false;
-                    if (value && value.length > 0)
-                        checked = value.indexOf(o.value) > -1 ? true : false;
-                                       
-                    return (
-                        <React.Fragment key={"cfr" + o.key}>
-                            <input {...props}
-                                className="form-input"
-                                type={type}
-                                key={o.key}
-                                name={o.name}
-                                checked={checked}
-                                value={o.value}
-                                onChange={(e)=>{this.onChange(e, m.key,"multiple")}}
-                            />
-                            <label key={"ll" +o.key }>{o.label}</label>
-                        </React.Fragment>
-                     );
-                });
-
-                input = <div className ="form-group-checkbox">{input}</div>;
-            }
+            if (type === "checkbox")
+                input = <CheckBox m={m} value={value} onChange={this.onChange} {...props} />    
             
             return (
                 <div key={'g' + key} className="form-group">

@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import DynamicForm from './components/DynamicForm';
 import model from './model.json';
+import tools from './tools'
 import './App.css';
 
 class App extends Component {
@@ -19,7 +20,7 @@ class App extends Component {
     if (model.id) {
       data = data.filter((d) => { return d.id !== model.id });
     } else {
-      model.id = 4;     
+      model.id = tools.getUniqueId();     
     }
     
     this.setState({ data: [model, ...data] });
