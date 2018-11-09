@@ -27,4 +27,4 @@ function getQueryParameter(key) {
     }
 }  
 
-export default { toDate, toDateTime, getUniqueId,getQueryParameter }
+export default { toDate, toDateTime, getUniqueId, getQueryParameter }

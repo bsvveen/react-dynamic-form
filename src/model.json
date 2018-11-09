@@ -1,20 +1,23 @@
 [
-    {"key": "name", "label": "Name", "props": { "required": true}},
-    {"key": "age","label": "Age", "type": "number"},
-    {"key": "rating", "label": "Rating", "type": "number", "props":{"min":0,"max":5}},
-    {"key": "gender", "label": "Gender", "type":"radio", "options":[
-      {"key":"male", "label":"Male","name":"gender","value":"male"},
-      {"key":"female","label":"Female","name": "gender","value":"female"}
+    {"key": "tekst", "label": "Tekst", "props": { "required": true}},
+    {"key": "meertekst", "label": "Meer tekst"},
+    {"key": "datum", "label": "Datum", "type": "date"},
+    {"key": "nummer","label": "Nummer", "type": "number", "props":{"min":0,"max":5}},    
+    {"key": "geslacht", "label": "geslacht", "type":"radio", "options":[
+      {"key": "onbekend",  "label": "Onbekend", "name": "geslacht", "value":"0"},
+      {"key": "man",  "label": "Man", "name": "geslacht", "value":"1"},
+      {"key": "vrouw", "label": "Vrouw", "name": "geslacht", "value":"2"}
+    ]},    
+    {"key": "lijst", "label":"Lijst", "type":"select", "value" : "onbekend", "options": [
+        {"key":"onbekend" ,"label":"Mumbai","value" : "onbekend"},
+        {"key":"item1", "label":"Item1","value":"Item1"},
+        {"key":"item2", "label":"Item2","value":"Item2"},
+        {"key":"item3", "label":"Item3","value":"Item3"}
     ]},
-    {"key": "qualification", "label": "Qualification"},
-    {"key": "city", "label":"City", "type":"select", "value" : "Kerala", "options": [
-        {"key":"mumbai" ,"label":"Mumbai","value" : "Mumbai"},
-        {"key":"bangalore", "label":"Bangalore","value":"Bangalore"},
-        {"key":"kerala", "label":"Kerala","value":"Kerala"}
-    ]},
-    {"key": "skills","label":"Skills", "type":"checkbox", "options": [
-        {"key":"reactjs","label":"ReactJS","value":"reactjs"},
-        {"key":"angular","label":"Angular","value":"angular"},
-        {"key":"vuejs","label":"VueJS","value":"vuejs"}
+    {"key": "lijst2","label":"Lijst2", "type":"checkbox", "options": [
+        {"key":"onbekend" ,"label":"Mumbai","value" : "onbekend"},
+        {"key":"item1", "label":"Item1","value":"Item1"},
+        {"key":"item2", "label":"Item2","value":"Item2"},
+        {"key":"item3", "label":"Item3","value":"Item3"}
     ]}
 ]

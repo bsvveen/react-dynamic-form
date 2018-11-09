@@ -20,10 +20,24 @@ export default class DynamicForm extends React.Component {
 
     onSubmit = (e) => {
         e.preventDefault();
-        let result = Object.assign({}, this.props.defaultValues, this.state.data);
-        if (this.props.onSubmit) 
-            this.props.onSubmit(result);
-    }
+
+        let validationErrors = this.props.onValidate(this.state.data); 
+        if (Object.keys(validationErrors).some(x => validationErrors[x])) {
+            this.setState({ validationErrors: validationErrors })           
+            return;
+        }
+
+        if (this.props.onSubmit) {
+            this.setState({ loading: true });
+
+            let finalResult = Object.assign({}, this.props.defaultValues, this.state.data);
+            this.props.onSubmit(finalResult).then((reponse) => {
+                this.onReset;            
+            }).catch((errors) => {
+                this.setState({ "errors": [errors] });
+            }); 
+        }   
+    }    
 
     onChange = (e, key, type = "single") => {  
         let value;      
@@ -53,7 +67,8 @@ export default class DynamicForm extends React.Component {
             let name= m.name;
 
             let defaultValue = this.props.defaultValues[m.key] || "";
-            let value = this.state.data[key] || defaultValue;               
+            let value = this.state.data[key] || defaultValue;  
+            let errors = this.state.errors;             
 
             let input = <input {...props}
                     className="form-input"
@@ -81,6 +96,7 @@ export default class DynamicForm extends React.Component {
                         {m.label}
                     </label>
                     {input}
+                    <span className="error">{ errors[key] ? errors[key] : "" }</span>
                 </div>
             );
         });

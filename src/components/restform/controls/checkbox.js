@@ -4,7 +4,7 @@ export default class CheckBox extends React.Component {
 
     render () {  
         
-        var { m, value, type, props, onChange } = this.props;
+        var { m, value, props, onChange } = this.props;
         
         var input = m.options.map((o) => {                   
                    
@@ -16,7 +16,7 @@ export default class CheckBox extends React.Component {
                 <React.Fragment key={"cfr" + o.key}>
                     <input {...props}
                         className="form-input"
-                        type={type}
+                        type="checkbox"
                         key={o.key}
                         name={o.name}
                         checked={checked}
