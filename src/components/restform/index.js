@@ -2,6 +2,8 @@
 import React, { Component } from 'react';
 import DynamicForm from './dynamicform';
 import Repository from './repository';
+import List from './controls/list';
+
 import shared from './shared';
 
 class RestForm extends Component {
@@ -37,10 +39,10 @@ class RestForm extends Component {
     }  
   }
 
-  onEdit = (id) => {
-    let data = Object.assign([], this.state.data);
-    let record = data.find((d) => { return d.id === id; });   
-    this.setState({ current: record })
+  onEdit = (object) => {   
+    this.repository.Get(object.id).then( getResponse => {
+      this.setState({ current: getResponse })
+    });
   }
 
   onNew = () => {       
@@ -54,22 +56,7 @@ class RestForm extends Component {
 
   render() {
     if (this.state.isLoading)
-      return null;
-    
-    let data = this.state.list.map((d) => {
-      return (
-        <tr key={d.id}>
-            <td>{d.name}</td>
-            <td>{d.age}</td>
-            <td>{d.qualification}</td>
-            <td>{d.gender}</td>
-            <td>{d.rating}</td>
-            <td>{d.city}</td>
-            <td>{(d.skills)?d.skills.join(","):""}</td>
-            <td><button onClick={()=>{this.onEdit(d.id)}}>edit</button></td>
-        </tr>
-      );
-    });
+      return null;   
     
     return (      
       <div className="App">
@@ -81,9 +68,7 @@ class RestForm extends Component {
           onValidate = {this.onValidate} 
         />
 
-        <table border="1">
-          <tbody>{data}</tbody>
-        </table>
+        <List items={this.state.list} onRowClick={this.onEdit} />
 
         <button onClick={this.onNew}>New</button>
 
