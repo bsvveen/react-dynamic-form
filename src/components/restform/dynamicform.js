@@ -23,7 +23,7 @@ export default class DynamicForm extends React.Component {
 
         let validationErrors = this.props.onValidate(this.state.data); 
         if (Object.keys(validationErrors).some(x => validationErrors[x])) {
-            this.setState({ validationErrors: validationErrors })           
+            this.setState({ errors: validationErrors })           
             return;
         }
 

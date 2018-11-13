@@ -7,8 +7,8 @@ class App extends Component {
 
   onValidate = (data) => {       
     let errors =  {
-        "date": data.date > new Date() ? "Date must be in the future" : false,
-        "name": data.name.length < 5 ? "Name must have more than 5 chartacters" : false    
+        "datum": data.datum > new Date() ? "Date must be in the future" : false,
+        "meertekst": data.meertekst.length < 25 ? "Name must have more than 25 chartacters" : false    
     }; 
     return errors;
   }
